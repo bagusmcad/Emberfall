@@ -1,8 +1,8 @@
 # Emberfall — Last Light of the Hearth
 
-[![Play on make.fun](https://img.shields.io/badge/Play%20on-make.fun-orange)](https://make.fun/bounty/best-game-01)
-[![Bounty: best-game-01](https://img.shields.io/badge/bounty-best--game--01-blue)](https://make.fun/bounty/best-game-01)
-[![Prize: $1,000](https://img.shields.io/badge/prize-%241%2C000-gold)](https://make.fun/bounty/best-game-01)
+[![make.fun · best-game-01](https://make.fun/badge/best-game-01.svg)](https://make.fun/bounty/best-game-01?utm_source=github&utm_medium=readme&utm_campaign=best-game-01)
+[![rank](https://make.fun/badge/best-game-01/bagusmcad/Emberfall/rank.svg)](https://make.fun/bounty/best-game-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=best-game-01)
+[![reward](https://make.fun/badge/best-game-01/bagusmcad/Emberfall/reward.svg)](https://make.fun/bounty/best-game-01?utm_source=github&utm_medium=readme&utm_campaign=best-game-01)
 
 An original top-down 2D arena survival shooter, written in plain HTML5, CSS and
 JavaScript with no libraries, no build step and no network requests. All art is
