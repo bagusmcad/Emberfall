@@ -13,6 +13,7 @@ import {
   createEnemy,
   createWorld,
   offerUpgrades,
+  setBanner,
   startWave,
   updatePlay,
 } from './entities.js';
@@ -90,6 +91,87 @@ function buildTitle(seed) {
   return world;
 }
 
+function buildBoss(seed) {
+  const rng = makeRng(seed);
+  const world = createWorld(rng);
+  world.best = 18750;
+  world.state = 'play';
+  // A run deep into its final wave: eight upgrades taken, a high score, and
+  // the Keeper hurt but still fighting — the frame should read as a siege.
+  world.score = 16420;
+  world.kills = 148;
+  world.comboBest = 9;
+  world.shotsFired = 860;
+  world.shotsHit = 664;
+  world.runTime = 612;
+  world.time = 612;
+  world.upgradesTaken = ['rapid', 'twin', 'heavy', 'hide', 'swift', 'longfuse', 'magnet', 'pierce'];
+  world.player.hp = 100;
+  world.player.x = HEARTH.x - 150;
+  world.player.y = HEARTH.y + 150;
+  world.player.angle = -0.7;
+  // Live power-ups, so the HUD's bottom-right shows active timers.
+  world.player.spreadTimer = 6;
+  world.player.rapidTimer = 4;
+  world.player.shieldUp = true;
+  world.player.ward = true;
+  world.player.shieldTimer = 8;
+  // Wave 10 is the Hollow King alone; his guard joins him so the frame is
+  // a siege, not a duel: two gilded elite brutes, an elite wraith and a
+  // spitter flanking the hearth while the King fires radial bursts.
+  startWave(world, 10);
+  const guard = [
+    ['brute', -260, -140, true],
+    ['brute', 280, 120, true],
+    ['wraith', -300, 160, true],
+    ['spitter', 300, -160, false],
+  ];
+  for (const [kind, dx, dy, elite] of guard) {
+    world.enemies.push(createEnemy(kind, 10, rng, HEARTH.x + dx, HEARTH.y + dy, elite));
+  }
+  // Seven seconds of real combat: radial bursts in flight, summoned mites,
+  // and the Keeper's bullets already flying. Short enough that the scripted
+  // Keeper survives the King's volleys.
+  stepPlayScene(world, 7);
+  // Mid-fight, not the opening and not the kill: the King's health bar sits
+  // just past half, the combo meter is high, and the banner is fresh.
+  let boss = world.enemies.find((e) => e.kind === 'boss');
+  if (!boss) {
+    boss = createEnemy('boss', 10, rng, HEARTH.x + 40, HEARTH.y - 180, false);
+    world.enemies.push(boss);
+  }
+  boss.hp = Math.round(boss.maxHp * 0.55);
+  // A second ring of the King's call closes in around the hearth, so the
+  // frame is full of foes on every side instead of one duel in the middle.
+  const ring = [
+    ['mite', -320, -190], ['mite', -360, 60], ['mite', -180, 250],
+    ['mite', 330, -120], ['mite', 360, 140], ['mite', 140, 280],
+    ['spitter', -430, -60], ['spitter', 430, 200],
+    ['wraith', 300, -230],
+  ];
+  for (const [kind, dx, dy] of ring) {
+    world.enemies.push(createEnemy(kind, 10, rng, HEARTH.x + dx, HEARTH.y + dy, false));
+  }
+  // The Keeper is hurt but alive: a low, orange health bar, not a corpse.
+  // Power-up timers are refreshed here (the sim consumed them) so the HUD's
+  // bottom-right shows the run's active boons, and the Keeper steps clear
+  // of the King so both read in the frame.
+  world.player.hp = 38;
+  world.player.spreadTimer = 6;
+  world.player.rapidTimer = 4;
+  world.player.shieldUp = true;
+  world.player.ward = true;
+  world.player.shieldTimer = 8;
+  world.player.x = HEARTH.x - 280;
+  world.player.y = HEARTH.y + 130;
+  world.player.angle = Math.atan2(boss.y - world.player.y, boss.x - world.player.x);
+  world.combo = 9;
+  world.comboTimer = 2.4;
+  setBanner(world, 'THE HOLLOW KING', 'Defeat him. Keep the light.');
+  scatterEmbers(world, 6);
+  return world;
+}
+
 function buildPlay(seed) {
   const rng = makeRng(seed);
   const world = createWorld(rng);
@@ -136,11 +218,11 @@ function buildVictory(seed) {
   world.wave = 10;
   world.score = 18750;
   world.kills = 163;
-  world.comboBest = 5;
+  world.comboBest = 9;
   world.shotsFired = 940;
   world.shotsHit = 712;
   world.runTime = 648;
-  world.upgradesTaken = ['rapid', 'twin', 'heavy', 'hide'];
+  world.upgradesTaken = ['rapid', 'twin', 'heavy', 'hide', 'swift', 'longfuse', 'magnet', 'pierce'];
   world.player.hp = 38;
   world.player.x = HEARTH.x - 90;
   world.player.y = HEARTH.y + 140;
@@ -156,6 +238,7 @@ function buildVictory(seed) {
 
 // Build one of the four named scenes. Unknown names fall back to title.
 export function buildShotScene(scene, seed) {
+  if (scene === 'boss') return buildBoss(seed);
   if (scene === 'play') return buildPlay(seed);
   if (scene === 'upgrade') return buildUpgrade(seed);
   if (scene === 'victory') return buildVictory(seed);

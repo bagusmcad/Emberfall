@@ -136,7 +136,7 @@ function runShotMode() {
     upgradeRects = drawUpgrade(ctx, world);
   } else if (scene === 'victory') {
     drawVictory(ctx, world, world.time);
-  } else if (scene !== 'play') {
+  } else if (scene !== 'play' && scene !== 'boss') {
     drawTitle(ctx, world, world.time);
   }
   window.__shotReady = true;
